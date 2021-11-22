@@ -38,6 +38,7 @@ Twitter用户图片下载等等。
 | [Music163](/Music163)                     | 网易云音乐用户信息爬取并进行可视化分析。                     |
 | [Pap.er](/Pap.er)                         | pap.er网站壁纸图片爬取。                                     |
 | [Pinterest](/Pinterest)                   | Pinterest搜索结果图片下载                                    |
+| [Instagram](/Ins)                         | Instagram搜索结果保存到数据库                                    |
 | [Twitter](/Twitter)                       | Twitter单个用户media所有图片下载。                           |
 | [WeChat_AutoMessage](/WeChat_AutoMessage) | 使用wxpy库实现微信定时消息发送。                             |
 
