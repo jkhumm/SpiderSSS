@@ -101,7 +101,26 @@ def getProxy():
         'https': 'http://192.168.1.148:7890'
     }
 def getHeaders():
+    cookie = 'mid=YYOjugALAAHSnFfx3CKUjQ1rWvgB; ig_did=619086B5-DBC4-46B9-94DE-03573234571E; ig_nrcb=1; shbid="15883\05450238238285\0541668499338:01f7008e294c5a39b9b41373cbaf59d7795e7bfaffe2a806d37d8da47dfb4703140da9c8"; shbts="1636963338\05450238238285\0541668499338:01f7df11b396371f500d284530dda13bd618aaf96e0800bdd354ed12cd47e6dd3e3cdefb"; ds_user_id=50290853753; csrftoken=nobEQadsFZth1QJdgyagdOI6ly4wcRcg; sessionid=50290853753:f0bMp7w9si8LnG:11; rur="VLL\05450290853753\0541668845536:01f791f5ca5b7e0df003140fe32af00e48eaabc1bec27d8b8080011b85d43901b9d6e9e8"'
+    user_agent = ["Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36",
+                  "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36",
+                  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36",
+                  "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:30.0) Gecko/20100101 Firefox/30.0",
+                  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.75.14 (KHTML, like Gecko) Version/7.0.3 Safari/537.75.14",
+                  "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; Win64; x64; Trident/6.0)",
+                  'Mozilla/5.0 (Windows; U; Windows NT 5.1; it; rv:1.8.1.11) Gecko/20071127 Firefox/2.0.0.11',
+                  'Opera/9.25 (Windows NT 5.1; U; en)',
+                  'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)',
+                  'Mozilla/5.0 (compatible; Konqueror/3.5; Linux) KHTML/3.5.5 (like Gecko) (Kubuntu)',
+                  'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.0.12) Gecko/20070731 Ubuntu/dapper-security Firefox/1.5.0.12',
+                  'Lynx/2.8.5rel.1 libwww-FM/2.14 SSL-MM/1.4.1 GNUTLS/1.2.9',
+                  "Mozilla/5.0 (X11; Linux i686) AppleWebKit/535.7 (KHTML, like Gecko) Ubuntu/11.04 Chromium/16.0.912.77 Chrome/16.0.912.77 Safari/535.7",
+                  "Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:10.0) Gecko/20100101 Firefox/10.0 ",
+                  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36']
+    headers = {}
 
+    headers.setdefault('user-agent',user_agent[0])
+    headers.setdefault('cookie', cookie)
 
     # cookie_list = driver.get_cookies()
     # str_list = []
@@ -113,13 +132,9 @@ def getHeaders():
     #     if i != size - 1:
     #         single = single + ";"
     #     str_list.append(single)
-    cookie_str = ''
-    s='mid=YYOjugALAAHSnFfx3CKUjQ1rWvgB; ig_did=619086B5-DBC4-46B9-94DE-03573234571E; ig_nrcb=1; shbid="15883\05450238238285\0541668499338:01f7008e294c5a39b9b41373cbaf59d7795e7bfaffe2a806d37d8da47dfb4703140da9c8"; shbts="1636963338\05450238238285\0541668499338:01f7df11b396371f500d284530dda13bd618aaf96e0800bdd354ed12cd47e6dd3e3cdefb"; ds_user_id=50290853753; csrftoken=nobEQadsFZth1QJdgyagdOI6ly4wcRcg; sessionid=50290853753:f0bMp7w9si8LnG:11; rur="VLL\05450290853753\0541668845536:01f791f5ca5b7e0df003140fe32af00e48eaabc1bec27d8b8080011b85d43901b9d6e9e8"'
+    #cookie_str = ''
+    #headers.setdefault('cookie',cookie_str.join(str_list))
 
-    headers = {}
-    headers.setdefault('user-agent','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36')
-    # headers.setdefault('cookie',cookie_str.join(str_list))
-    headers.setdefault('cookie', s)
     return headers
 
 

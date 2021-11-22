@@ -3,6 +3,9 @@
 当当图书爬虫、网易云用户信息爬虫、GitHub用户信息爬虫、
 Twitter用户图片下载等等。
 
+文篇文章fork至：https://github.com/stormstone/SpiderSSS
+我在此处做了个延伸，增加了一些日常其它网站的爬取和爬取方式。
+
 
 <br></br>
 ### 文档
