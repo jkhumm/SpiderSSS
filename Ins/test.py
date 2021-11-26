@@ -143,13 +143,6 @@ def map_func():
 
 
 if __name__ == '__main__':
-   # str1 = "Photo by 张子枫 on February 01, 2021. May be a closeup of one or more people."
-   # print(get_Publish_time(str2))
-   # time.localtime()
-   # map_func()
-   # dateStr_to_datetime("2021年1月12日")
-   # test2()
-    print(1)
-    print(time.localtime() > time.localtime())
+   print(1)
 
 
