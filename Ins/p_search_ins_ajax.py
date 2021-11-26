@@ -3,30 +3,65 @@ import json
 import re
 import urllib.parse
 
-import eventlet
 import time
 import pymysql
 import requests
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as expected_conditions
 
 from config import *
 
-eventlet.monkey_patch()
+#eventlet.monkey_patch() https://zhuanlan.zhihu.com/p/37679547
 
-print("---------------init-------------")
-chrome_options = Options()
-chrome_options.add_argument('--headless')  # 使用无头谷歌浏览器模式，如你要调试请注释
-chrome_options.add_argument('--disable-gpu')
-chrome_options.add_argument('--no-sandbox')
-chrome_options.add_argument("--proxy-server=" + proxy_server)
-driver = webdriver.Chrome(options=chrome_options)
+def getProxy():
+    #用户名： 912bef8175c0   授权码： b962a7c83d
+    return {
+        'http': 'http://127.0.0.1:7890', # http://username:password@120.24.77.37:1056   http://127.0.0.1:7890
+        'https': 'http://127.0.0.1:7890'
+    }
+
+def getHeaders():
+    # 163邮箱账号 humm_ins163
+    #cookie = 'mid=YZxbIwALAAHm1uM2xmDj6xeSiFe8; ig_did=C85EDD35-5DA7-4932-808A-D37F9A30E3E1; ig_nrcb=1; csrftoken=4cz9koAjLOdVcRkOOdyNHsWwImj9plnB; ds_user_id=50290853753; sessionid=50290853753%3AwelLxOkpJrIQbq%3A27; rur="VLL\05450290853753\0541669172920:01f76c987245916453627b782eb2179f16f5f65890668491073675236d2406baf4b6038b"'
+    # 企业邮箱账号 humm
+    #cookie = 'mid=YYOjugALAAHSnFfx3CKUjQ1rWvgB; ig_did=619086B5-DBC4-46B9-94DE-03573234571E; ig_nrcb=1; shbid="15883\05450238238285\0541669084807:01f7b585d01f18ca73edfc6dbc8092c4558d8fe7b49f7f2cf5b0fc67360caf18e7748a85"; shbts="1637548807\05450238238285\0541669084807:01f70199d28af67ca9180c29e266a7008cb467dc48e3682a1f403ffdbc022c70f77c7563"; datr=34ScYXpoiE-uEQBXIdLZp9kp; csrftoken=Ya2BsPMHnvY0QBV8LchKF5jElwlnL1mX; ds_user_id=50648183942; sessionid=50648183942:cTgoeTsIyEMi2J:26; rur="VLL\05450648183942\0541669281792:01f7a094f6464ec82805e57397515d6a201243243c23b736407ddfe6111e49302786c98d"'
+    # 186手机号 humm_abcd
+    cookie = 'YYOjugALAAHSnFfx3CKUjQ1rWvgB; ig_did=619086B5-DBC4-46B9-94DE-03573234571E; ig_nrcb=1; shbid="15883\05450238238285\0541669084807:01f7b585d01f18ca73edfc6dbc8092c4558d8fe7b49f7f2cf5b0fc67360caf18e7748a85"; shbts="1637548807\05450238238285\0541669084807:01f70199d28af67ca9180c29e266a7008cb467dc48e3682a1f403ffdbc022c70f77c7563"; datr=34ScYXpoiE-uEQBXIdLZp9kp; csrftoken=fcZI36Wc8KtnQpIcWk5mpZnMukh1IjLX; ds_user_id=50662902597; sessionid=50662902597%3AxXLz9k0QSJ5b5F%3A22; rur="VLL\05450662902597\0541669354838:01f7f9eaa6f1bec93aa77e5000ff889768fd91251952fb6ab80b30c45154413a9ae3c7d3"'
+    # 199手机号 lsp
+    #cookie = 'YYOjugALAAHSnFfx3CKUjQ1rWvgB; ig_did=619086B5-DBC4-46B9-94DE-03573234571E; ig_nrcb=1; shbid="15883\05450238238285\0541669084807:01f7b585d01f18ca73edfc6dbc8092c4558d8fe7b49f7f2cf5b0fc67360caf18e7748a85"; shbts="1637548807\05450238238285\0541669084807:01f70199d28af67ca9180c29e266a7008cb467dc48e3682a1f403ffdbc022c70f77c7563"; datr=34ScYXpoiE-uEQBXIdLZp9kp; csrftoken=ig7r6qMsy9QXjnH5xeOB4r5vfrpvDA10; ds_user_id=50361064848; sessionid=50361064848:i2owbDVmHxWnAu:18; rur="PRN\05450361064848\0541669276592:01f787a6b63a6f91fc25e9ee34de64c3bf927d87d16851037dbb989aa22ef76865e8ee43"'
+    user_agent = ["Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36",
+                  "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36",
+                  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36",
+                  "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:30.0) Gecko/20100101 Firefox/30.0",
+                  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.75.14 (KHTML, like Gecko) Version/7.0.3 Safari/537.75.14",
+                  "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; Win64; x64; Trident/6.0)",
+                  'Mozilla/5.0 (Windows; U; Windows NT 5.1; it; rv:1.8.1.11) Gecko/20071127 Firefox/2.0.0.11',
+                  'Opera/9.25 (Windows NT 5.1; U; en)',
+                  'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)',
+                  'Mozilla/5.0 (compatible; Konqueror/3.5; Linux) KHTML/3.5.5 (like Gecko) (Kubuntu)',
+                  'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.0.12) Gecko/20070731 Ubuntu/dapper-security Firefox/1.5.0.12',
+                  'Lynx/2.8.5rel.1 libwww-FM/2.14 SSL-MM/1.4.1 GNUTLS/1.2.9',
+                  "Mozilla/5.0 (X11; Linux i686) AppleWebKit/535.7 (KHTML, like Gecko) Ubuntu/11.04 Chromium/16.0.912.77 Chrome/16.0.912.77 Safari/535.7",
+                  "Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:10.0) Gecko/20100101 Firefox/10.0 "]
+    headers = {}
+
+    headers.setdefault('user-agent',user_agent[0])
+    headers.setdefault('cookie', cookie)
+
+    # cookie_list = driver.get_cookies()
+    # str_list = []
+    # size = len(cookie_list)
+    # for i in range(size):
+    #     key = cookie_list[i]['name']
+    #     value = cookie_list[i]['value']
+    #     single = key + "=" + value
+    #     if i != size - 1:
+    #         single = single + ";"
+    #     str_list.append(single)
+    # cookie_str = ''
+    # headers.setdefault('cookie',cookie_str.join(str_list))
+
+    return headers
 
 base_url = 'https://www.instagram.com/'
-
 
 # ------------------------------------------------ 数据库操作层开始 ------------------------------------------------
 
@@ -42,6 +77,8 @@ def update_ins_account_enums(ins_account,ins_tag_count,followers_count,follow_co
         con.rollback()
     else:
         con.commit()
+        con.close()
+        cue.close()
 
 def batch_insert_ins_tag_info(ins_info_list,photo_info_list,video_info_list):
     con = pymysql.connect(host=host, user=user, passwd=psd, db=db, charset=c, port=port)
@@ -63,6 +100,8 @@ def batch_insert_ins_tag_info(ins_info_list,photo_info_list,video_info_list):
         con.rollback()
     else:
         con.commit()
+        con.close()
+        cue.close()
 
 def query_one_by_ins_account(ins_account):
     con = pymysql.connect(host=host, user=user, passwd=psd, db=db, charset=c, port=port)
@@ -73,6 +112,8 @@ def query_one_by_ins_account(ins_account):
         return cue.fetchone()
     except Exception as e:
         print('query_one_by_ins_account error:', e)
+    con.close()
+    cue.close()
 
 def query_newest_one(ins_account):
     con = pymysql.connect(host=host, user=user, passwd=psd, db=db, charset=c, port=port)
@@ -83,6 +124,8 @@ def query_newest_one(ins_account):
         return cue.fetchone()
     except Exception as e:
         print('query_newest_one error:', e)
+    con.close()
+    cue.close()
 
 def query_all_ins_account():
     con = pymysql.connect(host=host, user=user, passwd=psd, db=db, charset=c, port=port)
@@ -95,49 +138,6 @@ def query_all_ins_account():
         print('query_all_ins_account error:', e)
 # ------------------------------------------------ 数据库操作层结束 ------------------------------------------------
 # ------------------------------------------------ 公共模块层开始 ------------------------------------------------
-def getProxy():
-    return {
-        'http': 'http://192.168.1.148:7890',
-        'https': 'http://192.168.1.148:7890'
-    }
-def getHeaders():
-    cookie = 'mid=YYOjugALAAHSnFfx3CKUjQ1rWvgB; ig_did=619086B5-DBC4-46B9-94DE-03573234571E; ig_nrcb=1; shbid="15883\05450238238285\0541668499338:01f7008e294c5a39b9b41373cbaf59d7795e7bfaffe2a806d37d8da47dfb4703140da9c8"; shbts="1636963338\05450238238285\0541668499338:01f7df11b396371f500d284530dda13bd618aaf96e0800bdd354ed12cd47e6dd3e3cdefb"; ds_user_id=50290853753; csrftoken=nobEQadsFZth1QJdgyagdOI6ly4wcRcg; sessionid=50290853753:f0bMp7w9si8LnG:11; rur="VLL\05450290853753\0541668845536:01f791f5ca5b7e0df003140fe32af00e48eaabc1bec27d8b8080011b85d43901b9d6e9e8"'
-    user_agent = ["Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36",
-                  "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36",
-                  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36",
-                  "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:30.0) Gecko/20100101 Firefox/30.0",
-                  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.75.14 (KHTML, like Gecko) Version/7.0.3 Safari/537.75.14",
-                  "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; Win64; x64; Trident/6.0)",
-                  'Mozilla/5.0 (Windows; U; Windows NT 5.1; it; rv:1.8.1.11) Gecko/20071127 Firefox/2.0.0.11',
-                  'Opera/9.25 (Windows NT 5.1; U; en)',
-                  'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)',
-                  'Mozilla/5.0 (compatible; Konqueror/3.5; Linux) KHTML/3.5.5 (like Gecko) (Kubuntu)',
-                  'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.0.12) Gecko/20070731 Ubuntu/dapper-security Firefox/1.5.0.12',
-                  'Lynx/2.8.5rel.1 libwww-FM/2.14 SSL-MM/1.4.1 GNUTLS/1.2.9',
-                  "Mozilla/5.0 (X11; Linux i686) AppleWebKit/535.7 (KHTML, like Gecko) Ubuntu/11.04 Chromium/16.0.912.77 Chrome/16.0.912.77 Safari/535.7",
-                  "Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:10.0) Gecko/20100101 Firefox/10.0 ",
-                  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36']
-    headers = {}
-
-    headers.setdefault('user-agent',user_agent[0])
-    headers.setdefault('cookie', cookie)
-
-    # cookie_list = driver.get_cookies()
-    # str_list = []
-    # size = len(cookie_list)
-    # for i in range(size):
-    #     key = cookie_list[i]['name']
-    #     value = cookie_list[i]['value']
-    #     single = key + "=" + value
-    #     if i != size - 1:
-    #         single = single + ";"
-    #     str_list.append(single)
-    #cookie_str = ''
-    #headers.setdefault('cookie',cookie_str.join(str_list))
-
-    return headers
-
-
 def resolve_account_data(account_data):
     account = {
         'country': account_data['country_code'],
@@ -222,23 +222,24 @@ def general_resolve_media(media):
 
 def searchUser(ins_account):
     print("-------准备进入 " + ins_account + " 明星主页面-------")
-    response = requests.get("https://www.instagram.com/" + ins_account + "/", proxies=getProxy(), headers=getHeaders())
+    response = requests.get("https://www.instagram.com/" + ins_account + "/", proxies=getProxy(), headers=getHeaders(),timeout=10)
+    if re.search("login", response.url) is not None:
+        print("访问失败的情况，账号可能存在被限制的可能")
+        return
     regex = r"\s*.*\s*<script.*?>.*_sharedData\s*=\s*(.*?);<\/script>"
 
     # driver.get(base_url + ins_account)
     #match_result = re.match(regex, driver.page_source, re.S)
     match_result = re.match(regex, response.text, re.S)
     data = json.loads(match_result.group(1))
-
     account = resolve_account_data(data)
-
     one = query_one_by_ins_account(ins_account=ins_account)
     # 查询帖子数是否存在更新
     if account['ins_tag_count'] == one[3]:
         print("do nothing")
     else:
         node_list = []
-        first = 200
+        first = 50
         if one[3] is None:
             print("全量插入")
             # 首次加载的数据放入到总的集合中
@@ -292,10 +293,6 @@ def struct_time_to_datetime(struct_time):
     date_time = datetime.datetime(year=year, month=month, day=day, hour=hour, minute=min, second=sec)
     return date_time
 
-
-
-
-
 def batch_insert_data(ins_account, node_list):
     # 组装批量插入所需数据结构 泛型是tuple
     ins_info_list = []  # [('https://www.instagram.com/p/CVva4NEPIYM/','__zf0827__','2021-11-11 12:12:00')]
@@ -320,6 +317,7 @@ def batch_insert_data(ins_account, node_list):
     batch_insert_ins_tag_info(ins_info_list, photo_info_list, video_info_list)
 
 def get_media_by_user_id(user_id, first, end_cursor, has_next_page, node_list, is_go_on_query, last_publish_time, total_count):
+    num = 1
     base_query_url = "https://www.instagram.com/graphql/query/?query_hash=8c2a529969ee035a5063f2fc8602a0fd&variables="
     while has_next_page:
         variables = json.dumps({
@@ -328,8 +326,9 @@ def get_media_by_user_id(user_id, first, end_cursor, has_next_page, node_list, i
             'after': str(end_cursor)
         }, separators=(',', ':'))  # 不指定separators的话key:value的:后会默认有空格，因为其默认separators为(', ', ': ')
         url = base_query_url + urllib.parse.quote(variables)
-        print("分页接口之前node_list的大小：" + str(len(node_list)) + "，总计大小为：" + str(total_count))
-
+        print("分页接口之前node_list的大小：" + str(len(node_list)) + "，总计大小为：" + str(total_count) + "，访问次数：" + str(num))
+        time.sleep(1)
+        num = num + 1
         response = requests.get(url, proxies=getProxy(), headers=getHeaders())
         media_json_data = json.loads(response.text)
         status = media_json_data['status']
@@ -361,34 +360,14 @@ def get_media_by_user_id(user_id, first, end_cursor, has_next_page, node_list, i
 if __name__ == '__main__':
     try:
         print("数据库链接上，准备开始登陆ins账号")
-        # driver.get(base_url)
-        # time.sleep(1)
-        #
-        # # 先找到登陆按钮，点击登录按钮弹出登陆页面，输入密码后登陆完成即可
-        # driver.find_element_by_xpath("//input[@name='username']").send_keys(LOGIN_EMAIL)
-        # driver.find_element_by_xpath("//input[@name='password']").send_keys(LOGIN_PASSWORD)
-        #
-        # driver.find_element_by_xpath("//button[@type='submit']").click() # 点击登陆按钮
-        #
-        # #同步阻塞 会弹出一个遮罩层，提示你保存你的登录信息
-        # element = WebDriverWait(driver, 15).until(expected_conditions.presence_of_element_located((By.XPATH, "//div[@class='cmbtv']//button"))).click() # 点击以后再说
-        #
-        # print("登陆完成")
-
-        # 去除那个弹出提示框        等价 == driver.find_elements_by_xpath("//div[@role='dialog']//button")[1]
-        # try:
-        #     driver.find_element_by_xpath("//div[@role='dialog']//button[last()]").click()
-        # except:
-        #     # 浏览器无头模式没有此按钮
-        #     pass
         # 轮询ins账号
         # total_ins_account = query_all_ins_account()
-        total_ins_account = ((1, 'celine'),) # __zf0827__
+        total_ins_account = ((1, 'natgeo'),) # __zf0827__ (2, 'mariadelaord'),(3, 'dianasilverss'),
         for singleIns in total_ins_account:
             searchUser(singleIns[1]) # 取出index=1 的字段
             print(singleIns[1] + "该明星查找完毕")
 
     finally:
         print("finally")
-        driver.quit()
+       # driver.quit()
 
